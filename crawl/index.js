@@ -73,9 +73,15 @@ var md5 = require('md5');
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/([A-Z][a-z]*_)*[A-Z][a-z]*/) !== null) {
-				fetchPage('https://en.wikipedia.org' + ref, function(dom) {
-					linkDFS(dom, url, filterInfo);
-				});
+				if (ref.match(/(List)|(list)/) !== null) {
+					fetchPage('https://en.wikipedia.org' + ref, function(dom) {
+						linkDFS(dom, url, filterPeopleIndex);
+					});
+				} else {
+					fetchPage('https://en.wikipedia.org' + ref, function(dom) {
+						linkDFS(dom, url, filterInfo);
+					});
+				}
 				return true;
 			}
 		}
@@ -119,5 +125,6 @@ var md5 = require('md5');
 			fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc, url) {
 				linkDFS(doc, url, filterTableIndex);
 			});
+			break;
 	};
 })();
