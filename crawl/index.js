@@ -56,7 +56,7 @@ var md5 = require('md5');
 			var parser = new htmlparser.Parser(handler);
 			parser.parseComplete(body);
 		});
-	}, 500);
+	}, process.env.INTERVAL || 500);
 	var filterTableIndex = function(doc, url) {
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
@@ -73,7 +73,7 @@ var md5 = require('md5');
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/([A-Z][a-z]*_)*[A-Z][a-z]*/) !== null) {
-				if (ref.match(/(List)|(list)/) !== null) {
+				if (ref.match(/(List)|(list)|(Category)/) !== null) {
 					fetchPage('https://en.wikipedia.org' + ref, function(dom) {
 						linkDFS(dom, url, filterPeopleIndex);
 					});
