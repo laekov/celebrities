@@ -88,7 +88,7 @@ var md5 = require('md5');
 				return 0;
 			}
 			var attr = doc.attribs.class;
-			if (typeof(attr) === 'string' && attr.match(/infobox vcard/) !== null) {
+			if (typeof(attr) === 'string' && attr.match(/(infobox)|(vcard)/) !== null) {
 				var htmlText = html(doc).replace("//upload", "https://upload");
 				if (htmlText.match(/(Born)|(Occupation)|(Died)|(Nationality)|(Education)/) !== null) {
 					console.log('person got ' + (++ personCount));
@@ -104,13 +104,20 @@ var md5 = require('md5');
 			linkDFS(doc.children, url, filter);
 		}
 	};
-	/*fetchPage('https://en.wikipedia.org/wiki/Frank_Abbandando', function(doc) {
-		linkDFS(doc, filterInfo);
-	});*/
-	/*fetchPage('https://en.wikipedia.org/wiki/List_of_teetotalers', function(doc) {
-		linkDFS(doc, filterPeopleIndex);
-	});*/
-	fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc, url) {
-		linkDFS(doc, url, filterTableIndex);
-	});
+	switch (2) {
+		case 0:
+			fetchPage('https://en.wikipedia.org/wiki/Brian_Kobilka', function(doc, url) {
+				linkDFS(doc, url, filterInfo);
+			});
+			break;
+		case 1:
+			fetchPage('https://en.wikipedia.org/wiki/List_of_teetotalers', function(doc) {
+				linkDFS(doc, filterPeopleIndex);
+			});
+			break;
+		case 2:
+			fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc, url) {
+				linkDFS(doc, url, filterTableIndex);
+			});
+	};
 })();
