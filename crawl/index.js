@@ -84,9 +84,9 @@ var md5 = require('md5');
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/([A-Z][a-z]*_)*[A-Z][a-z]*/) !== null) {
-				// if (ref.match(/(List)|(list)/) !== null) {
-				if (false) {
-					fetchPage('https://en.wikipedia.org' + ref, 'pi', function(dom) {
+				if (ref.match(/(List_of)/) !== null) {
+				//if (false) {
+					fetchPage('https://en.wikipedia.org' + ref, 'pie', function(dom) {
 						linkDFS(dom, url, filterPeopleIndex);
 					});
 				} else {
