@@ -1,13 +1,18 @@
 var request = require('request');
 var jq = require('jquery');
-var { JSDOM } = require('jsdom');
 var htmlparser = require('htmlparser');
 var html = require('htmlparser-to-html');
 var randomstring = require('randomstring');
 var fs = require('fs');
+var md5 = require('md5');
 
 (function() {
+	try {
+		fs.mkdirSync('data');
+	} catch(error) {
+	}
 	var requestQue = [];
+	var urlRec = {};
 	var fetchPage = function(url, callback) {
 		requestQue.push({
 			url: url,
@@ -30,6 +35,10 @@ var fs = require('fs');
 		];
 		var req = requestQue[0];
 		requestQue.shift();
+		if (urlRec[req.url] !== undefined) {
+			return;
+		}
+		urlRec[req.url] = true;
 		request({
 			url: req.url,
 			headers: {
@@ -41,31 +50,31 @@ var fs = require('fs');
 					console.error(error);
 				} else {
 					console.log(req.url + ' fetched count = ' + (++ fetchCount));
-					req.callback(dom);
+					req.callback(dom, req.url);
 				}
 			});
 			var parser = new htmlparser.Parser(handler);
 			parser.parseComplete(body);
 		});
 	}, 500);
-	var filterTableIndex = function(doc) {
+	var filterTableIndex = function(doc, url) {
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/List_of/) !== null) {
 				fetchPage('https://en.wikipedia.org' + ref, function(dom) {
-					linkDFS(dom, filterPeopleIndex);
+					linkDFS(dom, url, filterPeopleIndex);
 				});
 				return true;
 			}
 		}
 		return null;
 	};
-	var filterPeopleIndex = function(doc) {
+	var filterPeopleIndex = function(doc, url) {
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/([A-Z][a-z]*_)*[A-Z][a-z]*/) !== null) {
 				fetchPage('https://en.wikipedia.org' + ref, function(dom) {
-					linkDFS(dom, filterInfo);
+					linkDFS(dom, url, filterInfo);
 				});
 				return true;
 			}
@@ -73,27 +82,26 @@ var fs = require('fs');
 		return false;
 	};
 	var personCount = 0;
-	var filterInfo = function(doc) {
+	var filterInfo = function(doc, url) {
 		if (doc.name === 'table') {
 			if (typeof(doc.attribs) !== 'object') {
 				return 0;
 			}
 			var attr = doc.attribs.class;
 			if (typeof(attr) === 'string' && attr.match(/infobox vcard/) !== null) {
-				console.log('person got ' + (++ personCount));
 				var htmlText = html(doc).replace("//upload", "https://upload");
-				fs.writeFile('data/' + randomstring.generate({
-					length: 16,
-					charset: '0123456789abcdef'
-				}) + '.html', htmlText);
+				if (htmlText.match(/(Born)|(Occupation)|(Died)|(Nationality)|(Education)/) !== null) {
+					console.log('person got ' + (++ personCount));
+					fs.writeFile('data/' + md5(htmlText) + '.html', htmlText);
+				}
 			}
 		}
 	};
-	var linkDFS = function(dom, filter) {
+	var linkDFS = function(dom, url, filter) {
 		for (var ti in dom) {
 			var doc = dom[ti];
-			filter(doc);
-			linkDFS(doc.children, filter);
+			filter(doc, url);
+			linkDFS(doc.children, url, filter);
 		}
 	};
 	/*fetchPage('https://en.wikipedia.org/wiki/Frank_Abbandando', function(doc) {
@@ -102,7 +110,7 @@ var fs = require('fs');
 	/*fetchPage('https://en.wikipedia.org/wiki/List_of_teetotalers', function(doc) {
 		linkDFS(doc, filterPeopleIndex);
 	});*/
-	fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc) {
-		linkDFS(doc, filterTableIndex);
+	fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc, url) {
+		linkDFS(doc, url, filterTableIndex);
 	});
 })();

@@ -13,6 +13,7 @@
     "htmlparser-to-html": "0.0.6",
     "jquery": "^3.2.1",
     "jsdom": "^11.2.0",
+    "md5": "^2.2.1",
     "randomstring": "^1.1.5",
     "request": "^2.81.0"
   }
