@@ -13,15 +13,16 @@ var md5 = require('md5');
 	}
 	var requestQue = [];
 	var urlRec = {};
-	var fetchPage = function(url, callback) {
+	var fetchPage = function(url, type, callback) {
 		var data = {
 			url: url,
 			callback: callback,
+			type: type,
 		};
-		if (randInt(2) === 0) {
-			requestQue.push(data);
-		} else {
+		if (randInt(20) === 0) {
 			requestQue.unshift(data);
+		} else {
+			requestQue.push(data);
 		}
 	};
 	var randInt = function(x) {
@@ -45,6 +46,10 @@ var md5 = require('md5');
 			return;
 		}
 		urlRec[req.url] = true;
+		if (req.url.match(/(talk)|(Talk)|(Special)|(User)|(user)|(Wikipedia:)|(About)|(Help)/)) {
+			console.log('abandon');
+			return;
+		}
 		request({
 			url: req.url,
 			headers: {
@@ -55,7 +60,7 @@ var md5 = require('md5');
 				if (error) {
 					console.error(error);
 				} else {
-					console.log(req.url + ' fetched count = ' + (++ fetchCount));
+					console.log('aquired ' + req.url + ' as ' + req.type + ' fetch count = ' + (++ fetchCount));
 					req.callback(dom, req.url);
 				}
 			});
@@ -67,7 +72,7 @@ var md5 = require('md5');
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/List_of/) !== null) {
-				fetchPage('https://en.wikipedia.org' + ref, function(dom) {
+				fetchPage('https://en.wikipedia.org' + ref, 'pie', function(dom) {
 					linkDFS(dom, url, filterPeopleIndex);
 				});
 				return true;
@@ -79,12 +84,13 @@ var md5 = require('md5');
 		if (doc.name === 'a') {
 			var ref = doc.attribs.href;
 			if (typeof(ref) === 'string' && ref.match(/^\/wiki\/([A-Z][a-z]*_)*[A-Z][a-z]*/) !== null) {
-				if (ref.match(/(List)|(list)|(Category)/) !== null) {
-					fetchPage('https://en.wikipedia.org' + ref, function(dom) {
+				// if (ref.match(/(List)|(list)/) !== null) {
+				if (false) {
+					fetchPage('https://en.wikipedia.org' + ref, 'pi', function(dom) {
 						linkDFS(dom, url, filterPeopleIndex);
 					});
 				} else {
-					fetchPage('https://en.wikipedia.org' + ref, function(dom) {
+					fetchPage('https://en.wikipedia.org' + ref, 'pi', function(dom) {
 						linkDFS(dom, url, filterInfo);
 					});
 				}
@@ -118,17 +124,17 @@ var md5 = require('md5');
 	};
 	switch (2) {
 		case 0:
-			fetchPage('https://en.wikipedia.org/wiki/Brian_Kobilka', function(doc, url) {
+			fetchPage('https://en.wikipedia.org/wiki/Brian_Kobilka', 'pi', function(doc, url) {
 				linkDFS(doc, url, filterInfo);
 			});
 			break;
 		case 1:
-			fetchPage('https://en.wikipedia.org/wiki/List_of_teetotalers', function(doc) {
-				linkDFS(doc, filterPeopleIndex);
+			fetchPage('https://en.wikipedia.org/wiki/List_of_teetotalers', 'pie', function(doc, url) {
+				linkDFS(doc, url, filterPeopleIndex);
 			});
 			break;
 		case 2:
-			fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', function(doc, url) {
+			fetchPage('https://en.wikipedia.org/wiki/Lists_of_people', 'pte', function(doc, url) {
 				linkDFS(doc, url, filterTableIndex);
 			});
 			break;
