@@ -14,10 +14,15 @@ var md5 = require('md5');
 	var requestQue = [];
 	var urlRec = {};
 	var fetchPage = function(url, callback) {
-		requestQue.push({
+		var data = {
 			url: url,
 			callback: callback,
-		});
+		};
+		if (randInt(2) === 0) {
+			requestQue.push(data);
+		} else {
+			requestQue.unshift(data);
+		}
 	};
 	var randInt = function(x) {
 		return Math.floor(Math.random() * x);
@@ -25,6 +30,7 @@ var md5 = require('md5');
 	var fetchCount = 0;
 	setInterval(function() {
 		if (requestQue.length == 0) {
+			console.log('Empty request queue');
 			return;
 		}
 		const uas = [
