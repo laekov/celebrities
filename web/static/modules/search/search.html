@@ -1,0 +1,18 @@
+<style>
+span.hlsearch {
+	color: #aa0011;
+};
+</style>
+<div class='container-fluid'>
+	<div ng-if='info.length' class='alert alert-{{ infotype }}'>
+		<span>{{ info }}</span>
+	</div>
+	<div paging page="curpage" page-size="pagesize" total="totpage" paging-action="changePage()" show-prev-next="true" show-first-last="true"></div>
+	<div class='wrapper'>
+		<div ng-repeat='person in curList' id='pinfo_{{ person.id }}'>
+			<a href='#/cele/view/{{ person.id }}' id='name'></a>
+			<div id='content'></div>
+		</div>
+	</div>
+	<div paging page="curpage" page-size="pagesize" total="totpage" paging-action="changePage()" show-prev-next="true" show-first-last="true"></div>
+</div>

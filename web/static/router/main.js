@@ -1,6 +1,6 @@
 angular.module('celebrities', [
 	'ui.router',
-	'oc.lazyLoad',
+	'bw.paging',
 ]).run([ 
 	'$rootScope', 
 	'$state', 

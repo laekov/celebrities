@@ -6,6 +6,8 @@ var navCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', '$tim
 			$rootScope.searchText = text;
 			$state.go('main.search', {
 				searchText: text
+			}, {
+				reload: true
 			});
 		}
 	};

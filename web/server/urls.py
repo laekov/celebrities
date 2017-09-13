@@ -25,7 +25,10 @@ import os;
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/test', api.test),
+    url(r'^api/search', api.search),
+    url(r'^api/reload', api.reload),
     url(r'^static/(?P<path>.*)$', views.serve),
     url(r'^', main.main),
 ];
 
+api.reload(None)
