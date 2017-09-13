@@ -1,0 +1,54 @@
+<style>
+#maindiv {
+	min-height: 100%;
+	background-image: url("/static/images/bg.jpg");
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	text-align: center;
+}
+#logodiv {
+	margin-top: 20%;
+}
+img#logomain {
+	width: 100%;
+}
+.bgtrans {
+	opacity: 0.5;
+	-o-opacity: 0.5;
+	-moz-opacity: 0.5;
+}
+.bgtrans:hover {
+	opacity: 0.9;
+	-o-opacity: 0.9;
+	-moz-opacity: 0.9;
+}
+.bgtrans:focus {
+	opacity: 0.9;
+	-o-opacity: 0.9;
+	-moz-opacity: 0.9;
+}
+</style>
+<div class='container-fluid'>
+	<div id='maindiv' class='col-xs-12' style='background: url("/static/images/bg.jpg")'>
+		<div class='row'>
+			<div class='col-xs-12 col-md-6 col-md-offset-3' id='logodiv'>
+				<img id='logomain' src='/static/images/logo.png'>
+			</div>
+		</div>
+		<div class='row'>
+			<div id='mainsearchboxdiv' class='col-xs-12 col-md-6 col-md-offset-3'>
+				<div class='input-group'>
+					<input type='text' class='form-control bgtrans' ng-model='searchcontent' placeholder='Type something to search' id='searchtext'/>
+					<span class='input-group-btn'>
+						<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
+							<i class='glyphicon glyphicon-send'></i> Go
+						</button>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

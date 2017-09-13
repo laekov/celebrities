@@ -1,0 +1,51 @@
+<style>
+img#logo {
+	width: 100%;
+}
+div.pagenav {
+	margin-top: 30px;
+	float: fixed;
+}
+</style>
+<div class='container-fluid pagenav'>
+	<div class='row'>
+		<div class='col-xs-6 col-sm-3'>
+			<a ui-sref='home'>
+				<img id='logo' src='/static/images/logo.png'>
+			</a>
+		</div>
+		<div class='col-xs-12 col-sm-9' style='padding-top: 10px;'>
+			<div class='input-group'>
+				<input type='text' class='form-control bgtrans' ng-model='searchcontent' placeholder='Type something to search' id='searchtext'/>
+				<span class='input-group-btn'>
+					<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
+						<i class='glyphicon glyphicon-send'></i> Go
+					</button>
+				</span>
+			</div>
+		</div>
+	</div>
+	<hr>
+</div>
+<div class='container-fluid' style='min-height: 100%'>
+	<div ui-view></div>
+</div>
+<div class='container'>
+	<div class='row'>
+		<div class='col-xs-6 col-sm-3'>
+			<a ui-sref='home'>
+				<img id='logo' src='/static/images/logo.png'>
+			</a>
+		</div>
+		<div class='col-xs-12 col-sm-9' style='padding-top: 10px;'>
+			<div class='input-group'>
+				<input type='text' class='form-control bgtrans' ng-model='searchcontent' placeholder='Type something to search' id='searchtext'/>
+				<span class='input-group-btn'>
+					<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
+						<i class='glyphicon glyphicon-send'></i> Go
+					</button>
+				</span>
+			</div>
+		</div>
+	</div>
+</div>

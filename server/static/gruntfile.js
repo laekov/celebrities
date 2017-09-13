@@ -14,8 +14,23 @@ module.exports = function(grunt) {
 				},
 			}
 		},
+		watch: {
+			dev: {
+				files: [ 'router/*.js', 'modules/*/*.js' ],
+				tasks: [ 'concat:dev' ]
+			}
+		},
+		concurrent: {
+			dev: {
+				tasks: [ 'concat', 'watch' ],
+				options: {
+					logConcurrentOutput: true
+				}
+			}
+		}
     });
 	require('load-grunt-tasks')(grunt);
 	grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.registerTask('default', [ 'concat' ]);
+	grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.registerTask('default', [ 'concurrent' ]);
 };
