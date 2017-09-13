@@ -53,9 +53,10 @@ def dfsChildren(ele, itid):
             return;
         for kw in re.findall(r"[A-Za-z\']+", ele.string):
             ikw = kw.encode('utf-8').strip().lower();
-            if (not (ikw in ctdx)):
-                ctdx[ikw] = [];
-            ctdx[ikw].append(itid);
+            if (len(ikw) > 3):
+                if (not (ikw in ctdx)):
+                    ctdx[ikw] = [];
+                ctdx[ikw].append(itid);
 
 def calculate():
     global nmdx;
@@ -70,9 +71,19 @@ def calculate():
         namess = soup.select('.fn');
         for namear in namess:
             name = namear.contents[0];
-            if ('contents' in name):
+            if (len(namear.contents) > 1):
+                names = namear.select('li');
+                for namer in names:
+                    name = namer.contents[0].encode('utf-8').strip().lower();
+                    if (len(name) < 3):
+                        continue;
+                    if (not (name in nmdx)):
+                        nmdx[name] = [];
+                    nmdx[name].append(itid);
                 continue;
             name = name.encode('utf-8').strip().lower();
+            if (len(name) < 3):
+                continue;
             if (not (name in nmdx)):
                 nmdx[name] = [];
             nmdx[name].append(itid);

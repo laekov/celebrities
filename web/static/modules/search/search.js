@@ -1,4 +1,4 @@
-var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', function($scope, $rootScope, $state, $stateParams, $http) {
+var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', '$timeout', function($scope, $rootScope, $state, $stateParams, $http, $timeout) {
 	var content = $state.params.searchText;
 	$scope.content = content;
 	var id = $state.params.id;
@@ -10,7 +10,6 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', fu
 		content: content
 	}).then(function(data) {
 		var dEnd = Date.now();
-		$scope.info = 'Searching done. Used ' + (dEnd - dStart) + 'ms';
 		$scope.infotype = 'success';
 		$scope.fullList = [];
 		for (var i in data.data) {
@@ -22,6 +21,7 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', fu
 				rank: data.data[i]
 			});
 		}
+		$scope.info = 'Searching done. Used ' + (dEnd - dStart) + 'ms. Found ' + $scope.fullList.length + ' people.';
 		$scope.fullList.sort(function(a, b) {
 			return b.rank - a.rank;
 		});
@@ -48,23 +48,28 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', fu
 		// $('#pinfo_' + pinfo.id).find('#content').html(pinfo.html);
 	};
 	$scope.changePage = function() {
-		$scope.curList = $scope.fullList.slice(($scope.curpage - 1) * $scope.pagesize, $scope.curpage * $scope.pagesize);
-		for (var i in $scope.curList) {
-			if ($scope.curList[i].name === undefined) {
-				$scope.fetchPerson($scope.curList[i], showPerson);
-			} else {
-				(function(i) {
-					setTimeout(function() {
-						showPerson($scope.curList[i]);
-					}, 100);
-				})(i);
+		$timeout(function() {
+			$scope.curList = $scope.fullList.slice(($scope.curpage - 1) * $scope.pagesize, $scope.curpage * $scope.pagesize);
+			for (var i in $scope.curList) {
+				if ($scope.curList[i].name === undefined) {
+					$scope.fetchPerson($scope.curList[i], showPerson);
+				} else {
+					(function(i) {
+						$timeout(function() {
+							showPerson($scope.curList[i]);
+						}, 100);
+					})(i);
+				}
 			}
-		}
+		}, 100);
 	};
 	$scope.fetchPerson = function(pinfo) {
 		$http.get('/static/data/' + pinfo.id + '.html').then(function(data) {
 			var ele = $(data.data);
 			var namee = ele.find('.fn');
+			if (namee.length > 1) {
+				namee = $(namee[0]);
+			}
 			while (typeof(namee.children) === 'function' && namee.children().length > 0) {
 				namee = $(namee.children()[0]);
 			}
