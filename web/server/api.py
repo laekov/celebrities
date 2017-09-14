@@ -9,7 +9,7 @@ import json;
 def test(req):
     return HttpResponse('<h1>Test fine</h1>');
 
-nmdx = { };
+kwdx = { };
 ctdx = { };
 
 def addScore(dt, cid, sco):
@@ -21,14 +21,14 @@ def addScore(dt, cid, sco):
 @csrf_exempt
 def search(req):
     rankwei = 1000000;
-    global nmdx;
+    global kwdx;
     global ctdx;
     res = {};
     qbody = json.loads(req.body);
     qstr = qbody['content'].lower();
     qss = qstr.split(' ');
-    for i in nmdx:
-        v = nmdx[i];
+    for i in kwdx['name']:
+        v = kwdx['name'][i];
         if (i.find(qstr) > -1 or qstr.find(i) > -1):
             for j in v:
                 addScore(res, j, rankwei);
@@ -37,30 +37,64 @@ def search(req):
                 for j in v:
                     addScore(res, j, rankwei / 2 / (i.count(' ') + 1));
     for i in qss:
-        if (i in ctdx):
-            for j in ctdx[i]:
-                addScore(res, j, rankwei / 8 / len(ctdx[i]));
+        if (i.find(':') == -1):
+            if (i in ctdx):
+                for j in ctdx[i]:
+                    addScore(res, j, rankwei / 8 / len(ctdx[i]));
+        else:
+            (field, text) = i.split(':');
+            texts = text.lower().split('_');
+            if (not (field in kwdx)):
+                continue;
+            for j in texts:
+                if (j in kwdx[field]):
+                    for k in kwdx[field][j]:
+                        addScore(res, k, rankwei / len(kwdx[field][j]));
+
     return HttpResponse(json.dumps(res));
 
-def dfsChildren(ele, itid):
-    global ctdx;
-    if ('contents' in ele):
-        ch = ele.contents;
-        for i in ch:
-            dfsChildren(i, itid);
-    else:
-        if (ele.string == None):
-            return;
-        for kw in re.findall(r"[A-Za-z\']+", ele.string):
-            ikw = kw.encode('utf-8').strip().lower();
-            if (len(ikw) > 3):
-                if (not (ikw in ctdx)):
-                    ctdx[ikw] = [];
-                ctdx[ikw].append(itid);
+def getName(soup, itid, nmdx):
+    namess = soup.select('.fn');
+    for namear in namess:
+        name = namear.contents[0];
+        if (len(namear.contents) > 1):
+            names = namear.select('li');
+            for namer in names:
+                name = namer.contents[0].encode('utf-8').strip().lower();
+                if (len(name) < 3):
+                    continue;
+                if (not (name in nmdx)):
+                    nmdx[name] = [];
+                nmdx[name].append(itid);
+            continue;
+        name = name.encode('utf-8').strip().lower();
+        if (len(name) < 3):
+            continue;
+        if (not (name in nmdx)):
+            nmdx[name] = [];
+        nmdx[name].append(itid);
+
+def getContent(ele):
+    cstr = ele.string;
+    if (cstr == None):
+        cstr = (' ').join(ele.strings);
+    exp = re.compile(r'<[^\w*]>');
+    return (' ').join(exp.split(cstr)).lower().split(' ');
+
+def insertKeys(ele, itid, mp):
+    for i in getContent(ele):
+        if (len(i) < 3):
+            continue;
+        if (not (i in mp)):
+            mp[i] = [];
+        mp[i].append(itid);
 
 def calculate():
-    global nmdx;
     global ctdx;
+    global kwdx;
+    kws = [ 'name', 'born', 'education', 'occupation', 'nationality' ];
+    for kw in kws:
+        kwdx[kw] = { };
     datapath = path.join(path.dirname(path.realpath(__file__)), '../../crawl/data/');
     filelist = os.listdir(datapath);
     for item in filelist:
@@ -68,33 +102,27 @@ def calculate():
         inft = open(path.join(datapath, item));
         soup = BeautifulSoup(inft.read());
         inft.close();
-        namess = soup.select('.fn');
-        for namear in namess:
-            name = namear.contents[0];
-            if (len(namear.contents) > 1):
-                names = namear.select('li');
-                for namer in names:
-                    name = namer.contents[0].encode('utf-8').strip().lower();
-                    if (len(name) < 3):
-                        continue;
-                    if (not (name in nmdx)):
-                        nmdx[name] = [];
-                    nmdx[name].append(itid);
-                continue;
-            name = name.encode('utf-8').strip().lower();
-            if (len(name) < 3):
-                continue;
-            if (not (name in nmdx)):
-                nmdx[name] = [];
-            nmdx[name].append(itid);
+        getName(soup, itid, kwdx['name']);
         kisss = soup.select('td');
         for keyss in kisss:
-            dfsChildren(keyss, itid);
-        tml = len(nmdx);
-        if (tml % 1000 == 0):
-            print len(nmdx), len(ctdx);
-    outf = open(path.join(datapath, 'nmdx.json'), 'w');
-    print >> outf, json.dumps(nmdx);
+            insertKeys(keyss, itid, ctdx);
+        trss = soup.select('tr');
+        for trs in trss:
+            for kw in kws:
+                isKw = False;
+                for i in trs.select('th'):
+                    cstr = (' ').join(getContent(i)); 
+                    if (re.compile(kw, re.I).match(cstr) != None):
+                        isKw = True;
+                        break;
+                if (isKw):
+                    for i in trs.select('td'):
+                        insertKeys(i, itid, kwdx[kw]);
+        tml = len(kwdx['name']);
+        if (tml % 100 == 0):
+            print len(kwdx['name']), len(ctdx);
+    outf = open(path.join(datapath, 'kwdx.json'), 'w');
+    print >> outf, json.dumps(kwdx);
     outf.close();
     outf = open(path.join(datapath, 'ctdx.json'), 'w');
     print >> outf, json.dumps(ctdx);
@@ -102,10 +130,10 @@ def calculate():
 
 def reload(req):
     datapath = path.join(path.dirname(path.realpath(__file__)), '../../crawl/data/');
-    global nmdx;
+    global kwdx;
     global ctdx;
-    infl = open(path.join(datapath, 'nmdx.json'), 'r');
-    nmdx = json.loads(infl.read());
+    infl = open(path.join(datapath, 'kwdx.json'), 'r');
+    kwdx = json.loads(infl.read());
     infl.close();
     infl = open(path.join(datapath, 'ctdx.json'), 'r');
     ctdx = json.loads(infl.read());
