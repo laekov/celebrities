@@ -45,7 +45,37 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', '$
 		}
 		// hlname += '(' + pinfo.rank + ')';
 		$('#pinfo_' + pinfo.id).find('#name').html(hlname);
-		// $('#pinfo_' + pinfo.id).find('#content').html(pinfo.html);
+		var outl = '';
+		var cnt = 0;
+		$(pinfo.html).find('tr').each(function(id, rawele) {
+			if (cnt > 5) {
+				return;
+			}
+			var ele = $(rawele);
+			var td = ele.find('td');
+			var otd = td.html();
+			if (typeof(otd) !== 'string') {
+				return;
+			}
+			otd = otd.replace(/<[^>]*>/g, ' ');
+			var tdh = otd;
+			for (var i in clst) {
+				tdh = tdh.replace(new RegExp(clst[i], 'gi'), function(orc) {
+					return "<span class='hlsearch'>" + orc + "</span>";
+				});
+			}
+			var thh = ele.find('th').html();
+			if (typeof(thh) !== 'string') {
+				return;
+			}
+			var titleX = new RegExp('Occupation|Nationality|Education|Born', 'i');
+			if (tdh !== otd || thh.match(titleX) !== null) {
+				thh = thh.replace(/<[^>]*>/g, ' ');
+				outl += '<p><em>' + thh + '</em>: ' + tdh + '</p>';
+				++ cnt;
+			}
+		});
+		$('#pinfo_' + pinfo.id).find('#content').html(outl);
 	};
 	$scope.changePage = function() {
 		$timeout(function() {
