@@ -7,8 +7,13 @@ div.infod {
 }
 </style>
 <div class='container-fluid'>
-	<div ng-if='info.length' class='alert alert-{{ infotype }}'>
-		<span>{{ info }}</span>
+	<div ng-if='info !== null' class='alert alert-{{ infotype }}'>
+		<div class='pull-right'>
+			<a href='' ng-click='hideInfo()'><i class='glyphicon glyphicon-remove text-{{ infotype }}'></i></a>
+		</div>
+		<div class=''>
+			<span>{{ info }}</span>
+		</div>
 	</div>
 	<div paging page="curpage" page-size="pagesize" total="totpage" paging-action="changePage()" show-prev-next="true" show-first-last="true"></div>
 	<div class='wrapper'>

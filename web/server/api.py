@@ -5,6 +5,7 @@ from os import path;
 from bs4 import BeautifulSoup;
 import re;
 import json;
+import math;
 
 def test(req):
     return HttpResponse('<h1>Test fine</h1>');
@@ -31,16 +32,16 @@ def search(req):
         v = kwdx['name'][i];
         if (i.find(qstr) > -1 or qstr.find(i) > -1):
             for j in v:
-                addScore(res, j, rankwei);
+                addScore(res, j, rankwei / 16);
         for k in qss:
             if (i.find(k) > -1):
                 for j in v:
-                    addScore(res, j, rankwei / 2 / (i.count(' ') + 1));
+                    addScore(res, j, rankwei / 32 / (i.count(' ') + 1));
     for i in qss:
         if (i.find(':') == -1):
             if (i in ctdx):
                 for j in ctdx[i]:
-                    addScore(res, j, rankwei / 8 / len(ctdx[i]));
+                    addScore(res, j, rankwei / 128 / len(ctdx[i]));
         else:
             (field, text) = i.split(':');
             texts = text.lower().split('_');
@@ -49,7 +50,7 @@ def search(req):
             for j in texts:
                 if (j in kwdx[field]):
                     for k in kwdx[field][j]:
-                        addScore(res, k, rankwei / len(kwdx[field][j]));
+                        addScore(res, k, rankwei / 4 / math.log(len(kwdx[field][j]) + 1));
 
     return HttpResponse(json.dumps(res));
 

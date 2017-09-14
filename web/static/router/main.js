@@ -23,6 +23,10 @@ angular.module('celebrities', [
 			templateUrl: '/static/modules/common/nav.html',
 			controller: navCtrl,
 			abstract: true,
+		}).state('main.adv', {
+			url: '/adv',
+			templateUrl: '/static/modules/search/adv.html',
+			controller: advCtrl,
 		}).state('main.search', {
 			url: '/search/:searchText',
 			templateUrl: '/static/modules/search/search.html',

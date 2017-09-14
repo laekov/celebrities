@@ -1,0 +1,13 @@
+<div class='container-fluid'>
+	<form>
+		<div class='form-group' ng-repeat='lb in searchLabels track by $index'>
+			<label>{{ lb.slice(0,1).toUpperCase() + lb.slice(1) }}</label>
+			<input class='form-control' type='text' ng-model='ctnts[$index]' placeholder='{{ lb }}'/>
+		</div>
+		<div class='form-group'>
+			<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
+				<i class='glyphicon glyphicon-send'></i> Search
+			</button>
+		</div>
+	</form>
+</div>

@@ -30,6 +30,11 @@ img#logomain {
 	-o-opacity: 0.9;
 	-moz-opacity: 0.9;
 }
+div.minput-group {
+	min-width: 100%;
+	margin-bottom: 32px;
+	text-align: center;
+}
 </style>
 <div class='container-fluid'>
 	<div id='maindiv' class='col-xs-12' style='background: url("/static/images/bg.jpg")'>
@@ -40,13 +45,16 @@ img#logomain {
 		</div>
 		<div class='row'>
 			<div id='mainsearchboxdiv' class='col-xs-12 col-md-6 col-md-offset-3'>
-				<div class='input-group'>
+				<div class='minput-group'>
 					<input type='text' class='form-control bgtrans' ng-model='searchcontent' placeholder='Type something to search' id='searchtext'/>
-					<span class='input-group-btn'>
-						<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
-							<i class='glyphicon glyphicon-send'></i> Go
-						</button>
-					</span>
+				</div>
+				<div class='minput-group'>
+					<button class='btn btn-default bgtrans' type='button' ng-click='search()'>
+						<i class='glyphicon glyphicon-send'></i> Search
+					</button>
+					<button class='btn btn-default bgtrans' type='button' ui-sref='main.adv'>
+						<i class='glyphicon glyphicon-plus'></i> Advanced
+					</button>
 				</div>
 			</div>
 		</div>

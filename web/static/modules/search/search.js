@@ -58,15 +58,23 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', '$
 				return;
 			}
 			otd = otd.replace(/<[^>]*>/g, ' ');
-			var tdh = otd;
-			for (var i in clst) {
-				tdh = tdh.replace(new RegExp(clst[i], 'gi'), function(orc) {
-					return "<span class='hlsearch'>" + orc + "</span>";
-				});
-			}
 			var thh = ele.find('th').html();
 			if (typeof(thh) !== 'string') {
 				return;
+			}
+			var tdh = otd;
+			for (var i in clst) {
+				if (clst[i].match(':') === null) {
+					tdh = tdh.replace(new RegExp(clst[i], 'gi'), function(orc) {
+						return "<span class='hlsearch'>" + orc + "</span>";
+					});
+				} else {
+					if (thh.trim().toLowerCase().match(new RegExp(clst[i].split(':')[0]), 'gi') !== null) {
+						tdh = tdh.replace(new RegExp(clst[i].split(':')[1], 'gi'), function(orc) {
+							return "<span class='hlsearch'>" + orc + "</span>";
+						});
+					}
+				}
 			}
 			var titleX = new RegExp('Occupation|Nationality|Education|Born', 'i');
 			if (tdh !== otd || thh.match(titleX) !== null) {
@@ -111,6 +119,9 @@ var searchCtrl = [ '$scope', '$rootScope', '$state', '$stateParams', '$http', '$
 			pinfo.html = 'Error';
 			showPerson(pinfo);
 		});
+	};
+	$scope.hideInfo = function() {
+		$scope.info = null;
 	};
 } ];
 
